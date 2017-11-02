@@ -11,10 +11,18 @@ import java.util.List;
  */
 public interface BMIService {
     /**
-     * Returns a BMI result object
-     * @param rules a set of rules against which to compare the resulting BMI
-     * @param bodyParameters the person's body parameters
+     * Returns a BMI result object - first, a BMI result value is calculated, then it gets compared to the supplied BMIRules.
+     * @param rules a set of rules against which to compare the resulting BMI.
+     * @param bodyParameters the person's body parameters.
      * @return a BMI result object with the resulting BMI and its interpretation.
      */
     BMIResult calculateBMIResult(List<BMIRule> rules, BodyParameters bodyParameters);
+
+    /**
+     * Calculates a raw BMI result value.
+     * @param bodyParameters the person's body parameters.
+     * @return the BMI result value.
+     * @throws IllegalArgumentException if either the height or weight value is non-positive.
+     */
+    public double getBMINumber(BodyParameters bodyParameters);
 }

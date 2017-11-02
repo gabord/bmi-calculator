@@ -46,9 +46,15 @@ public class BMIServiceImpl implements BMIService {
         return matchingRule;
     }
 
-    private double getBMINumber(BodyParameters bodyParameters) {
-        double heightInMeters = bodyParameters.getWeightInKilograms() / 100;
-        return bodyParameters.getWeightInKilograms() / Math.sqrt(heightInMeters);
+    public double getBMINumber(BodyParameters bodyParameters) {
+        if (bodyParameters.getHeightInCentimeters() <= 0) {
+            throw new IllegalArgumentException("Height must be non-negative!");
+        }
+        if (bodyParameters.getWeightInKilograms() <= 0) {
+            throw new IllegalArgumentException("Weight must be non-negative!");
+        }
+        double heightInMeters = bodyParameters.getHeightInCentimeters() / 100;
+        return bodyParameters.getWeightInKilograms() / Math.pow(heightInMeters,2);
     }
 
     private void checkBodyParameters(BodyParameters bodyParameters) throws BodyParameterOutOfBoundsException {
