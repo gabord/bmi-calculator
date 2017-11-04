@@ -3,6 +3,7 @@ package net.gaborc.service;
 import net.gaborc.domain.BMIRule;
 import net.gaborc.domain.BodyParameters;
 import net.gaborc.domain.dto.BMIResult;
+import net.gaborc.exception.BusinessException;
 
 import java.util.List;
 
@@ -15,8 +16,9 @@ public interface BMIService {
      * @param rules a set of rules against which to compare the resulting BMI.
      * @param bodyParameters the person's body parameters.
      * @return a BMI result object with the resulting BMI and its interpretation.
+     * @throws BusinessException when calculation of BMI was not successful given the arguments.
      */
-    BMIResult calculateBMIResult(List<BMIRule> rules, BodyParameters bodyParameters);
+    BMIResult calculateBMIResult(List<BMIRule> rules, BodyParameters bodyParameters) throws BusinessException;
 
     /**
      * Calculates a raw BMI result value.

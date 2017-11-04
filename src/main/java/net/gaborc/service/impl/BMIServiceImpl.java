@@ -5,34 +5,32 @@ import net.gaborc.domain.BMIRule;
 import net.gaborc.domain.BodyParameters;
 import net.gaborc.domain.dto.BMIResult;
 import net.gaborc.exception.BodyParameterOutOfBoundsException;
+import net.gaborc.exception.BusinessException;
+import net.gaborc.exception.NoMachingBMIRUleException;
 import net.gaborc.service.BMIService;
 
 import java.text.MessageFormat;
 import java.util.List;
 
 public class BMIServiceImpl implements BMIService {
-
     /**
      *
-     * @throws IllegalArgumentException either if the given body parameters are out of pre-defined ranges or no matching BMI rule was found for the result
+     * @throws BodyParameterOutOfBoundsException when given body parameters are out of app's pre-defined ranges
+     * @throws NoMachingBMIRUleException when neither of the supplied Rules are matching the calculated BMI
      */
-    public BMIResult calculateBMIResult(List<BMIRule> rules, BodyParameters bodyParameters) {
-        try {
+    public BMIResult calculateBMIResult(List<BMIRule> rules, BodyParameters bodyParameters) throws BusinessException {
+
             checkBodyParameters(bodyParameters);
             BMIResult bmiResult = new BMIResult();
             double result = getBMINumber(bodyParameters);
             BMIRule matchingRule = findMatchingRule(rules, result);
 
             if (matchingRule == null) {
-                throw new IllegalArgumentException("No matching rule was found for the BMI value: " + result);
+                throw new NoMachingBMIRUleException("No matching rule was found for the BMI value: " + result);
             }
             bmiResult.setResult(result);
             bmiResult.setDescription(matchingRule.getDescription());
             return bmiResult;
-        }
-        catch (BodyParameterOutOfBoundsException ex) {
-            throw new IllegalArgumentException(ex);
-        }
     }
 
     private BMIRule findMatchingRule(List<BMIRule> rules, double result) {
@@ -41,6 +39,7 @@ public class BMIServiceImpl implements BMIService {
         for (BMIRule bmiRule: rules) {
             if (bmiRule.isBetweenRange(result)) {
                 matchingRule = bmiRule;
+                break;
             }
         }
         return matchingRule;

@@ -4,6 +4,9 @@ import net.gaborc.constants.BMIConstants;
 import net.gaborc.domain.BMIRule;
 import net.gaborc.domain.BodyParameters;
 import net.gaborc.domain.dto.BMIResult;
+import net.gaborc.exception.BodyParameterOutOfBoundsException;
+import net.gaborc.exception.BusinessException;
+import net.gaborc.exception.NoMachingBMIRUleException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -71,10 +74,10 @@ class BMIServiceImplTest {
         Executable bodyAboveMaxWeightExecutable = () -> bmiService.calculateBMIResult(bmiRules, bodyParametersWithAboveMaxWeight);
         Executable bodyBelowMinWeightExecutable = () -> bmiService.calculateBMIResult(bmiRules, bodyParametersWithBelowMinWeight);
 
-        assertThrows(IllegalArgumentException.class, bodyAboveMaxHeightExecutable);
-        assertThrows(IllegalArgumentException.class, bodyAboveMaxWeightExecutable);
-        assertThrows(IllegalArgumentException.class, bodyBelowMinHeightExecutable);
-        assertThrows(IllegalArgumentException.class, bodyBelowMinWeightExecutable);
+        assertThrows(BodyParameterOutOfBoundsException.class, bodyAboveMaxHeightExecutable);
+        assertThrows(BodyParameterOutOfBoundsException.class, bodyAboveMaxWeightExecutable);
+        assertThrows(BodyParameterOutOfBoundsException.class, bodyBelowMinHeightExecutable);
+        assertThrows(BodyParameterOutOfBoundsException.class, bodyBelowMinWeightExecutable);
     }
 
     @Test
@@ -83,21 +86,27 @@ class BMIServiceImplTest {
         BodyParameters bodyParameters = new BodyParameters(100,200);
 
         Executable executable = () -> bmiService.calculateBMIResult(bmiRules, bodyParameters);
-        assertThrows(IllegalArgumentException.class, executable);
+        assertThrows(NoMachingBMIRUleException.class, executable);
     }
 
     @Test
     void calculateBMIResultShouldReturnCorrectBMIResult() {
-        BodyParameters bodyParameters = new BodyParameters(98,190);
+        try {
+            BodyParameters bodyParameters = new BodyParameters(98,190);
 
-        bmiRules.add(new BMIRule(0,18.4,"underweight"));
-        bmiRules.add(new BMIRule(18.5,24.9,"healthy"));
-        bmiRules.add(new BMIRule(25,29.9,"overweight"));
-        bmiRules.add(new BMIRule(30,100,"obese"));
+            bmiRules.add(new BMIRule(0,18.4,"underweight"));
+            bmiRules.add(new BMIRule(18.5,24.9,"healthy"));
+            bmiRules.add(new BMIRule(25,29.9,"overweight"));
+            bmiRules.add(new BMIRule(30,100,"obese"));
 
-        BMIResult result = bmiService.calculateBMIResult(bmiRules,bodyParameters);
+            BMIResult result = bmiService.calculateBMIResult(bmiRules,bodyParameters);
 
-        assertThat(result.getDescription(),equalTo("overweight"));
-        assertThat(result.getResult(),equalTo(27.146814404432135));
+            assertThat(result.getDescription(),equalTo("overweight"));
+            assertThat(result.getResult(),equalTo(27.146814404432135));
+        }
+        catch (BusinessException ex) {
+            // If an exception is thrown, it will be reported in the results...
+        }
+
     }
 }
